@@ -74,11 +74,11 @@ body {
 }
 
 .info-box-large {
-    flex: 2.2;
+    flex: 2.5;
 }
 
 .info-box-large h4 {
-    font-size: 1.4rem;
+    font-size: 1.45rem;
     font-weight: 700;
 }
 

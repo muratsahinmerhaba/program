@@ -52,7 +52,7 @@
                             <!-- Örnek satır -->
                             <tr>
                                 <td>1</td>
-                                <td><input type="text" class="form-control tutar" placeholder="Tutar" oninput="formatTutar(this)"></td>
+                                <td><input type="text" class="form-control tutar" placeholder="Tutar" inputmode="numeric" oninput="formatTutar(this)"></td>
                                 <td><input type="number" class="form-control vadeGun" placeholder="Gün" oninput="vadeGuncelle(this)"></td>
                                 <td><input type="date" class="form-control tarih" onchange="tarihGuncelle(this)"></td>
                                 <td><button class="btn btn-sm btn-danger" onclick="satirSil(this)">Sil</button></td>
