@@ -74,11 +74,11 @@ body {
 }
 
 .info-box-large {
-    flex: 1.8;
+    flex: 2.2;
 }
 
 .info-box-large h4 {
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     font-weight: 700;
 }
 
@@ -212,6 +212,12 @@ body {
 
     .table input.vadeGun {
         width: 45px;
+    }
+
+    .table input.tarih {
+        max-width: 80px;
+        padding: 0.15rem 0.25rem;
+        font-size: 0.75rem;
     }
 
     .btn {
