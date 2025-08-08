@@ -74,11 +74,11 @@ body {
 }
 
 .info-box-large {
-    flex: 1.6;
+    flex: 1.8;
 }
 
 .info-box-large h4 {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     font-weight: 700;
 }
 
@@ -227,26 +227,26 @@ body {
 
 .table input {
     width: 100%;
-    max-width: 120px;
+    max-width: 110px;
     margin: 0 auto;
     border-radius: 4px;
-    padding: 0.3rem 0.5rem;
-    font-size: 0.9rem;
+    padding: 0.25rem 0.4rem;
+    font-size: 0.85rem;
 }
 
 .table input.vadeGun {
-    min-width: 60px;
-    max-width: 70px;
+    min-width: 50px;
+    max-width: 60px;
 }
 
 .table input.tutar {
-    width: 120px;
+    width: 110px;
     max-width: 100%;
 }
 
 .table input.vadeGun {
-    width: 60px;
-    max-width: 70px;
+    width: 50px;
+    max-width: 60px;
 }
 
 .table input:focus {
