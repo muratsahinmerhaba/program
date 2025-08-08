@@ -48,7 +48,7 @@ body {
 
 .info-box-wrapper {
     display: flex;
-    gap: 10px;
+    gap: 8px;
     justify-content: space-between;
 }
 
@@ -66,11 +66,11 @@ body {
 }
 
 .info-box-small {
-    flex: 0.7;
+    flex: 0.8;
 }
 
 .info-box-small h4 {
-    font-size: 1rem;
+    font-size: 1.05rem;
 }
 
 .info-box-large {
