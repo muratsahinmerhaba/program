@@ -274,13 +274,14 @@
                 return `${year}-${month}-${day}`;
             }
             
-            // Tarih hesaplamaları
+            // Tarih hesaplamaları (takvim günleri dahil)
             function calculateDate(startDate, days) {
                 const result = new Date(startDate);
                 result.setDate(result.getDate() + days);
                 return result;
             }
             
+            // İki tarih arasındaki takvim günü sayısını hesapla
             function calculateDays(startDate, endDate) {
                 const oneDay = 24 * 60 * 60 * 1000;
                 const diffDays = Math.round(Math.abs((endDate - startDate) / oneDay));
@@ -431,7 +432,7 @@
                         const kayit = vadeKayitlari.find(k => k.id === id);
                         if (kayit) {
                             kayit.tarih = this.value;
-                            // Günü güncelle
+                            // Günü güncelle (takvim günü olarak)
                             const tarih = new Date(this.value);
                             const gun = calculateDays(baslangicTarihi, tarih);
                             kayit.gun = gun.toString();
@@ -595,7 +596,7 @@
                         const kayit = vadeKayitlari.find(k => k.id === id);
                         if (kayit) {
                             kayit.tarih = this.value;
-                            // Günü güncelle
+                            // Günü güncelle (takvim günü olarak)
                             const tarih = new Date(this.value);
                             const gun = calculateDays(baslangicTarihi, tarih);
                             kayit.gun = gun.toString();
@@ -669,17 +670,23 @@
                 }, 0);
                 document.getElementById('toplamTutar').textContent = `₺${formatCurrency(toplamTutar)}`;
                 
-                // Ortalama vade
-                if (gecerliKayitlar.length > 0) {
-                    const toplamGun = gecerliKayitlar.reduce((sum, kayit) => {
-                        const gun = parseInt(kayit.gun) || 0;
-                        return sum + gun;
-                    }, 0);
-                    const ortalamaGun = Math.round(toplamGun / gecerliKayitlar.length);
-                    document.getElementById('ortalamaVade').textContent = `${ortalamaGun} gün`;
+                // Ağırlıklı ortalama vade hesapla
+                if (gecerliKayitlar.length > 0 && toplamTutar > 0) {
+                    let agirlikliGunToplami = 0;
                     
-                    // Ortalama tarih
-                    const ortalamaTarih = calculateDate(baslangicTarihi, ortalamaGun);
+                    gecerliKayitlar.forEach(kayit => {
+                        const tutar = parseFloat(kayit.tutar.replace(/\./g, '').replace(',', '.')) || 0;
+                        const gun = parseInt(kayit.gun) || 0;
+                        // Tutar * gün çarpımını ağırlıklı toplama ekle
+                        agirlikliGunToplami += tutar * gun;
+                    });
+                    
+                    // Ağırlıklı ortalama gün = (tutar * gün toplamı) / toplam tutar
+                    const agirlikliOrtalamaGun = Math.round(agirlikliGunToplami / toplamTutar);
+                    document.getElementById('ortalamaVade').textContent = `${agirlikliOrtalamaGun} gün`;
+                    
+                    // Ortalama tarih (takvim günü olarak hesapla)
+                    const ortalamaTarih = calculateDate(baslangicTarihi, agirlikliOrtalamaGun);
                     document.getElementById('ortalamaTarih').textContent = formatDate(ortalamaTarih);
                 } else {
                     document.getElementById('ortalamaVade').textContent = '0 gün';
