@@ -1,0 +1,172 @@
+Vade Hesaplama Uygulaması Proje Dokümantasyonu
+1. Proje Amacı
+Vade Hesaplama Uygulaması, finansal işlemlerde vade takibi ve hesaplamaları yapmak için tasarlanmış profesyonel bir web tabanlı araçtır. Kullanıcıların birden fazla vade kaydı eklemesine, düzenlemesine ve bu kayıtların ortalama vade süresini hesaplamasına olanak tanır.
+
+Temel Amaçlar:
+Finansal vade takibini kolaylaştırmak
+Birden fazla vade kaydını tek bir arayüzde yönetmek
+Ağırlıklı ortalama vade hesaplaması yapmak
+Mobil ve masaüstü cihazlarda sorunsuz çalışmak
+2. Hedef Kitle
+Finans departmanı çalışanları
+Muhasebe profesyonelleri
+İşletme sahipleri
+Bankacılık sektörü çalışanları
+Vade takibi yapan tüm profesyoneller
+3. Temel Özellikler
+3.1. Başlangıç Tarihi Yönetimi
+Uygulama açıldığında varsayılan olarak bugünün tarihi gelir
+Kullanıcı başlangıç tarihini değiştirebilir
+Başlangıç tarihi değiştiğinde tüm vade günleri otomatik güncellenir (vade tarihleri sabit kalır)
+3.2. Vade Kayıtları Yönetimi
+Yeni vade kaydı ekleme
+Mevcut kayıtları düzenleme
+Kayıt silme
+Her kayıt için:
+Tutar (Türk Lirası cinsinden)
+Vade gün sayısı (takvim günleri)
+Vade tarihi
+3.3. Otomatik Hesaplamalar
+Gün-Tarih İlişkisi:
+Gün değiştiğinde vade tarihi otomatik hesaplanır
+Tarih değiştiğinde gün sayısı otomatik hesaplanır
+Ağırlıklı Ortalama Vade:
+Her kaydın tutarıyla orantılı olarak ağırlıklandırma
+Formül: (tutar × gün toplamı) / toplam tutar
+Özet Bilgiler:
+Toplam kayıt sayısı
+Ortalama vade süresi
+Ortalama vade tarihi
+Toplam tutar
+3.4. Kullanıcı Deneyimi Özellikleri
+Responsive Tasarım: Mobil ve masaüstü cihazlarda mükemmel görünüm
+Anlık Güncellemeler: Tüm değişiklikler anında yansır
+Para Formatı: Binlik ayraç olarak nokta, ondalık ayraç olarak virgül
+Boş Değer Yönetimi: Yeni kayıtlarda tutar ve gün alanları boş gelir
+Otomatik Odaklanma: Yeni kayıt eklendiğinde tutar alanına otomatik odaklanma
+4. Teknik Detaylar
+4.1. Kullanılan Teknolojiler
+Frontend: HTML5, CSS3, JavaScript (ES6+)
+CSS Framework: Tailwind CSS
+İkon Kütüphanesi: Font Awesome
+Veri Yapısı: JavaScript Array (in-memory storage)
+4.2. Tasarım Prensipleri
+Glass Morphism: Şeffaf ve bulanık arka plan efektleri
+Gradient Arka Planlar: Görsel hiyerarşi için renk geçişleri
+Animasyonlar: Yumuşak geçişler ve hover efektleri
+Responsive Grid: Farklı ekran boyutları için esnek grid yapısı
+4.3. Mobil Optimizasyonları
+Dokunmatik Odaklama: Input alanları için dokunma dostu boyutlar
+Sayısal Klavye: Tutar girildiğinde mobilde sayısal klavye açılması
+Kart Görünümü: Mobilde her kayıt için ayrı kart tasarımı
+İmleç Yönetimi: Güncelleme sırasında aktif input alanını koruma
+4.4. Hesaplama Mantığı
+Takvim Günü Hesaplaması: Hafta sonları dahil tüm günler
+Tarih Hesaplama: calculateDate(startDate, days) fonksiyonu
+Gün Sayısı Hesaplama: calculateDays(startDate, endDate) fonksiyonu
+Para Formatı: toLocaleString('tr-TR') ile Türk Lirası formatı
+5. Arayüz Detayları
+5.1. Başlık Bölümü
+Gradient arka planlı profesyonel başlık
+"Profesyonel Vade Takip" başlığı
+Başlangıç tarihi seçici (takvim ikonlu)
+5.2. Özet Kartları
+4 sütunlu grid düzeni (mobilde 2 sütun)
+Her kartta:
+Başlık (örn: "Kayıt Sayısı")
+Değer (örn: "3")
+İkon ve gölge efektleri
+5.3. Masaüstü Tablo Görünümü
+Profesyonel tablo tasarımı
+Hover efektleri
+Alternatif satır renkleri
+Inline düzenlenebilir hücreler
+5.4. Mobil Kart Görünümü
+Her kayıt için ayrı kart
+Gün ve vade tarihi aynı satırda
+Büyük dokunma alanları
+Net görsel ayrım
+5.5. Yeni Kayıt Ekleme
+Sayfanın altında konumlandırılmış buton
+Yuvarlatılmış tasarım
+Pulse animasyonu
+Büyük dokunma alanı
+6. Flutter Uygulaması İçin Dikkat Edilmesi Gerekenler
+lib/
+├── models/
+│   └── vade_kaydi.dart        # Vade kaydı modeli
+├── screens/
+│   ├── home_screen.dart      # Ana ekran
+│   └── vade_kayit_ekle.dart  # Yeni kayıt ekleme
+├── widgets/
+│   ├── vade_karti.dart       # Vade kartı widget'ı
+│   └── ozet_karti.dart       # Özet kartı widget'ı
+├── utils/
+│   ├── date_utils.dart       # Tarih hesaplama yardımcıları
+│   └── currency_utils.dart   # Para formatı yardımcıları
+└── main.dart                 # Uygulama giriş noktası
+6.2. State Yönetimi
+Provider veya Riverpod kullanımı önerilir
+Vade kayıtları için global state
+Başlangıç tarihi için state yönetimi
+Hesaplanan özet değerler için state
+6.3. Widget'lar
+Responsive Tasarım: MediaQuery ve LayoutBuilder kullanımı
+Vade Kartı: Card widget'ı ile özel tasarım
+Input Alanları: TextFormField ile özel formatter'lar
+Tarih Seçici: showDatePicker ile entegrasyon
+6.4. Veri Modeli
+class VadeKaydi {
+  final String id;
+  final double tutar;
+  final int gun;
+  final DateTime tarih;
+  
+  VadeKaydi({
+    required this.id,
+    required this.tutar,
+    required this.gun,
+    required this.tarih,
+  });
+}
+6.5. Platform Entegrasyonları
+iOS: intl paketi ile tarih formatlama
+Android: Material Design uyumluluğu
+Web: Responsive tasarım testleri
+6.6. Performans Optimizasyonları
+ListView.builder için uzun listeler
+Debounce kullanımı anlık güncellemeler için
+Stateless Widget kullanımı statik bileşenler için
+7. Test Senaryoları
+7.1. Temel Testler
+Yeni vade kaydı ekleme
+Mevcut kaydı düzenleme
+Kayıt silme
+Başlangıç tarihi değiştirme
+Tutar formatı testi
+7.2. Hesaplama Testleri
+Gün-tarih ilişkisi doğruluğu
+Ağırlıklı ortalama hesaplama
+Toplam tutar hesaplama
+Başlangıç tarihi değişimi etkileri
+7.3. Responsive Testler
+Mobil görünüm testi
+Tablet görünüm testi
+Masaüstü görünüm testi
+Ekran döndürme testleri
+8. Gelecek Geliştirmeler
+8.1. Veri Depolama
+Local storage entegrasyonu
+Cloud senkronizasyonu
+Kullanıcı profilleri
+8.2. İleri Özellikler
+Excel dışa aktarma
+PDF rapor oluşturma
+Grafiksel gösterimler
+Çoklu para birimi desteği
+8.3. Entegrasyonlar
+Banka API'leri
+Muhasebe programları
+Takvim uygulamaları
+9. Sonuç
+Bu proje dokümantasyonu, Vade Hesaplama Uygulaması'nın tüm teknik ve tasarım detaylarını içermektedir. Flutter uygulaması geliştirilirken bu doküman bir kaynak olarak kullanılabilir. Projenin başarısı, kullanıcı dostu arayüzü, doğru hesaplama mantığı ve mobil uyumluluğa dayanmaktadır.
