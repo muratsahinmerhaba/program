@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vade Hesaplama</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+        .input-focus {
+            transition: all 0.3s ease;
+        }
+        .input-focus:focus {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.3);
+        }
+        .btn-hover {
+            transition: all 0.3s ease;
+        }
+        .btn-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
+        
+        /* Responsive table styles */
+        @media (max-width: 768px) {
+            .table-container {
+                overflow-x: auto;
+            }
+            .mobile-card {
+                border: 1px solid #e5e7eb;
+                border-radius: 1rem;
+                margin-bottom: 1rem;
+                background-color: white;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                overflow: hidden;
+                display: flex;
+            }
+            .mobile-card-number {
+                background: linear-gradient(135deg, #4f46e5, #7c3aed);
+                color: white;
+                font-weight: bold;
+                font-size: 1rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 50px;
+                writing-mode: vertical-rl;
+                text-orientation: mixed;
+                transform: rotate(180deg);
+                letter-spacing: 0.1em;
+            }
+            .mobile-card-content {
+                flex: 1;
+                padding: 1rem;
+            }
+            .mobile-card-row {
+                margin-bottom: 0.75rem;
+            }
+            .mobile-card-row:last-child {
+                margin-bottom: 0;
+            }
+            .mobile-card-label {
+                font-weight: 600;
+                color: #4b5563;
+                font-size: 0.875rem;
+                margin-bottom: 0.25rem;
+            }
+            .mobile-card-value {
+                text-align: right;
+                font-weight: 500;
+            }
+            .desktop-table {
+                display: none;
+            }
+            
+            /* Combined row for day and date */
+            .combined-row {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 0.75rem;
+            }
+            
+            /* Swipe to delete styles */
+            .swipe-container {
+                position: relative;
+                overflow: hidden;
+                display: flex;
+            }
+            .swipe-content {
+                background: white;
+                transition: transform 0.3s ease;
+                flex: 1;
+                display: flex;
+            }
+            .swipe-delete {
+                position: absolute;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                width: 80px;
+                background: #ef4444;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                font-size: 1.5rem;
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+            }
+            .swipe-container.swiping .swipe-delete {
+                transform: translateX(0);
+            }
+            .swipe-container.swiping .swipe-content {
+                transform: translateX(-80px);
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .mobile-cards {
+                display: none;
+            }
+            .desktop-table {
+                display: table;
+            }
+            .desktop-table tbody tr {
+                border-bottom: 2px solid #f3f4f6;
+            }
+            .desktop-table tbody tr:nth-child(even) {
+                background-color: #f9fafb;
+            }
+            .desktop-table tbody tr:hover {
+                background-color: #f0f9ff;
+            }
+        }
+        
+        /* Amount input formatting */
+        .amount-input {
+            text-align: right;
+        }
+        
+        /* Custom date input styling */
+        .custom-date-input {
+            position: relative;
+        }
+        .custom-date-input input {
+            padding-left: 2.5rem;
+        }
+        .custom-date-input::before {
+            content: "\f073";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6b7280;
+            pointer-events: none;
+        }
+        
+        /* Header styling */
+        .header-date-picker {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            border-radius: 1rem;
+            padding: 1.25rem;
+            color: white;
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3), 0 4px 6px -2px rgba(79, 70, 229, 0.2);
+        }
+        
+        /* Mobile amount input styling */
+        .mobile-amount-input {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        /* Container background fix for mobile */
+        .content-container {
+            background-color: transparent;
+        }
+        
+        /* Empty state styling */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #6b7280;
+        }
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div class="container mx-auto px-4 py-6 max-w-6xl">
+        <!-- Başlık ve Tarih Seçimi -->
+        <header class="mb-6">
+            <div class="header-date-picker fade-in">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+                    <div class="mb-3 md:mb-0">
+                        <h1 class="text-2xl md:text-3xl font-bold text-white flex items-center">
+                            <i class="fas fa-calendar-day mr-3"></i>
+                            Profesyonel Vade Takip
+                        </h1>
+                        <p class="text-indigo-100 mt-1">Vade hesaplamaları için başlangıç tarihini belirleyin</p>
+                    </div>
+                    <div class="custom-date-input">
+                        <input type="date" id="baslangicTarihi" 
+                               class="input-focus w-full md:w-auto px-4 py-3 border border-indigo-300 rounded-lg focus:ring-2 focus:ring-white focus:border-indigo-200 bg-white/90 text-gray-800 font-medium">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Ana Bilgi Kartları -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+            <div class="glass-effect rounded-xl p-4 text-center fade-in">
+                <div class="text-gray-500 text-xs mb-1">Kayıt Sayısı</div>
+                <div class="text-lg md:text-xl font-semibold text-indigo-700" id="kayitSayisi">0</div>
+            </div>
+            <div class="glass-effect rounded-xl p-4 text-center fade-in">
+                <div class="text-gray-500 text-xs mb-1">Ort. Vade</div>
+                <div class="text-lg md:text-xl font-semibold text-indigo-700" id="ortalamaVade">0 gün</div>
+            </div>
+            <div class="glass-effect rounded-xl p-4 text-center fade-in">
+                <div class="text-gray-500 text-xs mb-1">Ort. Tarih</div>
+                <div class="text-lg md:text-xl font-semibold text-indigo-700" id="ortalamaTarih">-</div>
+            </div>
+            <div class="glass-effect rounded-xl p-4 text-center fade-in">
+                <div class="text-gray-500 text-xs mb-1">Toplam Tutar</div>
+                <div class="text-lg md:text-xl font-semibold text-indigo-700" id="toplamTutar">₺0,00</div>
+            </div>
+        </div>
+
+        <!-- Ana İçerik -->
+        <div class="content-container glass-effect rounded-2xl p-4 md:p-6 mb-6">
+            <!-- Mobil Kart Görünümü -->
+            <div class="mobile-cards" id="mobileCards">
+                <!-- Mobil kartlar JavaScript ile doldurulacak -->
+            </div>
+
+            <!-- Masaüstü Tablo Görünümü -->
+            <div class="table-container">
+                <table class="min-w-full divide-y divide-gray-200 desktop-table">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tutar (₺)</th>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Gün</th>
+                            <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vade Tarihi</th>
+                            <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200" id="vadeTableBody">
+                        <!-- Tablo içeriği JavaScript ile doldurulacak -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Yeni Kayıt Ekle Butonu - Sayfanın Altında -->
+        <div class="text-center mb-8">
+            <button id="yeniKayitEkle" class="btn-hover bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 px-8 rounded-full inline-flex items-center pulse-animation text-lg shadow-lg">
+                <i class="fas fa-plus mr-3"></i> Yeni Kayıt Ekle
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Bugünün tarihini al
+            const today = new Date();
+            const formattedToday = formatDateForInput(today);
+            
+            // Başlangıç verileri - 2 adet boş kayıt
+            let vadeKayitlari = [
+                { id: 1, tutar: '', gun: '', tarih: formattedToday },
+                { id: 2, tutar: '', gun: '', tarih: formattedToday }
+            ];
+            
+            let baslangicTarihi = today; // Bugünün tarihi ile başlat
+            let nextId = 3;
+            
+            // Elementler
+            const baslangicTarihiInput = document.getElementById('baslangicTarihi');
+            const yeniKayitEkleBtn = document.getElementById('yeniKayitEkle');
+            const vadeTableBody = document.getElementById('vadeTableBody');
+            const mobileCards = document.getElementById('mobileCards');
+            
+            // Başlangıç tarihini bugün olarak ayarla
+            baslangicTarihiInput.value = formattedToday;
+            
+            // Tarih formatla
+            function formatDate(date) {
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+                return `${day}.${month}.${year}`;
+            }
+            
+            // Tarih input formatı için yardımcı fonksiyon
+            function formatDateForInput(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+            
+            // Tarih hesaplamaları (takvim günleri dahil)
+            function calculateDate(startDate, days) {
+                const result = new Date(startDate);
+                result.setDate(result.getDate() + days);
+                return result;
+            }
+            
+            // İki tarih arasındaki takvim günü sayısını hesapla
+            function calculateDays(startDate, endDate) {
+                const oneDay = 24 * 60 * 60 * 1000;
+                const diffDays = Math.round(Math.abs((endDate - startDate) / oneDay));
+                return diffDays;
+            }
+            
+            // Para formatı (binlik ayıracı nokta, ondalık ayıracı virgül)
+            function formatCurrency(amount) {
+                return amount.toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            }
+            
+            // Para birimini parse et
+            function parseCurrency(str) {
+                return parseFloat(str.replace(/\./g, '').replace(',', '.'));
+            }
+            
+            // Tutar inputunu formatla (yazarken)
+            function formatAmountInput(value) {
+                // Sadece rakam ve virgül保留
+                let cleaned = value.replace(/[^\d,]/g, '');
+                
+                // Virgül varsa, sadece bir tane olmalı
+                let parts = cleaned.split(',');
+                if (parts.length > 2) {
+                    parts = [parts[0], parts.slice(1).join('')];
+                }
+                
+                // Ondalık kısmı en fazla 2 basamak
+                if (parts[1] && parts[1].length > 2) {
+                    parts[1] = parts[1].substring(0, 2);
+                }
+                
+                // Binlik ayıracı ekle
+                parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                
+                return parts.join(',');
+            }
+            
+            // Tabloyu güncelle
+            function updateTable() {
+                vadeTableBody.innerHTML = '';
+                
+                vadeKayitlari.forEach((kayit, index) => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50';
+                    
+                    row.innerHTML = `
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">${index + 1}</td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <input type="text" value="${kayit.tutar}" 
+                                   class="tutar-input amount-input w-full px-2 py-1 border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                                   data-id="${kayit.id}" placeholder="0,00">
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <input type="number" value="${kayit.gun}" min="0" 
+                                   class="gun-input w-full px-2 py-1 border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                                   data-id="${kayit.id}" placeholder="0">
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap">
+                            <input type="date" value="${kayit.tarih}" 
+                                   class="tarih-input w-full px-2 py-1 border border-gray-300 rounded focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                                   data-id="${kayit.id}">
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                            <button class="text-red-600 hover:text-red-900 delete-btn" data-id="${kayit.id}">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </td>
+                    `;
+                    
+                    vadeTableBody.appendChild(row);
+                });
+                
+                // Tutar inputları için olay dinleyicileri ekle
+                document.querySelectorAll('.tutar-input').forEach(input => {
+                    input.addEventListener('input', function() {
+                        const formattedValue = formatAmountInput(this.value);
+                        this.value = formattedValue;
+                        
+                        // Anlık olarak güncelle
+                        const id = parseInt(this.getAttribute('data-id'));
+                        const kayit = vadeKayitlari.find(k => k.id === id);
+                        if (kayit) {
+                            try {
+                                kayit.tutar = this.value;
+                                updateSummary();
+                            } catch (e) {
+                                // Hata durumunda hiçbir şey yapma
+                            }
+                        }
+                    });
+                    
+                    input.addEventListener('blur', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        const kayit = vadeKayitlari.find(k => k.id === id);
+                        if (kayit) {
+                            try {
+                                // Boş bırakılırsa 0 olarak kabul et
+                                kayit.tutar = this.value || '0';
+                                this.value = this.value || '';
+                                updateSummary();
+                            } catch (e) {
+                                this.value = kayit.tutar || '';
+                            }
+                        }
+                    });
+                });
+                
+                // Gün inputları için olay dinleyicileri ekle
+                document.querySelectorAll('.gun-input').forEach(input => {
+                    input.addEventListener('input', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        const kayit = vadeKayitlari.find(k => k.id === id);
+                        if (kayit) {
+                            kayit.gun = this.value;
+                            // Tarihi güncelle
+                            if (this.value) {
+                                const gun = parseInt(this.value) || 0;
+                                const yeniTarih = calculateDate(baslangicTarihi, gun);
+                                kayit.tarih = formatDateForInput(yeniTarih);
+                                // İlgili tarih inputunu güncelle
+                                const tarihInput = document.querySelector(`.tarih-input[data-id="${id}"]`);
+                                if (tarihInput) {
+                                    tarihInput.value = kayit.tarih;
+                                }
+                            }
+                            updateSummary();
+                            updateMobileCards();
+                        }
+                    });
+                    
+                    input.addEventListener('blur', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        const kayit = vadeKayitlari.find(k => k.id === id);
+                        if (kayit) {
+                            // Boş bırakılırsa 0 olarak kabul et
+                            kayit.gun = this.value || '0';
+                            this.value = this.value || '';
+                            updateSummary();
+                        }
+                    });
+                });
+                
+                // Tarih inputları için olay dinleyicileri ekle
+                document.querySelectorAll('.tarih-input').forEach(input => {
+                    input.addEventListener('input', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        const kayit = vadeKayitlari.find(k => k.id === id);
+                        if (kayit) {
+                            kayit.tarih = this.value;
+                            // Günü güncelle (takvim günü olarak)
+                            const tarih = new Date(this.value);
+                            const gun = calculateDays(baslangicTarihi, tarih);
+                            kayit.gun = gun.toString();
+                            // İlgili gün inputunu güncelle
+                            const gunInput = document.querySelector(`.gun-input[data-id="${id}"]`);
+                            if (gunInput) {
+                                gunInput.value = kayit.gun;
+                            }
+                            updateSummary();
+                            updateMobileCards();
+                        }
+                    });
+                });
+                
+                // Silme butonları için olay dinleyicileri ekle
+                document.querySelectorAll('.delete-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        vadeKayitlari = vadeKayitlari.filter(k => k.id !== id);
+                        updateTable();
+                        updateMobileCards();
+                        updateSummary();
+                    });
+                });
+                
+                // Mobil kartları da güncelle
+                updateMobileCards();
+            }
+            
+            // Mobil kartları güncelle
+            function updateMobileCards() {
+                // Aktif elemanı hatırla
+                let activeElement = document.activeElement;
+                let activeElementData = null;
+                
+                if (activeElement && mobileCards.contains(activeElement)) {
+                    activeElementData = {
+                        id: activeElement.getAttribute('data-id'),
+                        className: activeElement.className,
+                        value: activeElement.value,
+                        selectionStart: activeElement.selectionStart,
+                        selectionEnd: activeElement.selectionEnd
+                    };
+                }
+                
+                mobileCards.innerHTML = '';
+                
+                if (vadeKayitlari.length === 0) {
+                    // Boş durum gösterimi
+                    mobileCards.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-receipt-long"></i>
+                            <h3 class="text-lg font-medium text-gray-900 mb-2">Henüz vade kaydı bulunmuyor</h3>
+                            <p class="text-gray-500">Yeni kayıt eklemek için + butonuna basın</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                vadeKayitlari.forEach((kayit, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'mobile-card';
+                    
+                    card.innerHTML = `
+                        <div class="swipe-container" data-id="${kayit.id}">
+                            <div class="swipe-delete">
+                                <i class="fas fa-trash-alt"></i>
+                            </div>
+                            <div class="swipe-content">
+                                <div class="mobile-card-number">
+                                    ${index + 1}
+                                </div>
+                                <div class="mobile-card-content">
+                                    <div class="mobile-card-row">
+                                        <div class="mobile-card-label">Tutar (₺):</div>
+                                        <div class="mobile-card-value">
+                                            <input type="text" inputmode="decimal" value="${kayit.tutar}" 
+                                                   class="tutar-input-mobile amount-input mobile-amount-input w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 text-right"
+                                                   data-id="${kayit.id}" placeholder="0,00">
+                                        </div>
+                                    </div>
+                                    <div class="mobile-card-row combined-row">
+                                        <div>
+                                            <div class="mobile-card-label">Gün:</div>
+                                            <div class="mobile-card-value">
+                                                <input type="number" value="${kayit.gun}" min="0" 
+                                                       class="gun-input-mobile w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 text-right"
+                                                       data-id="${kayit.id}" placeholder="0">
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div class="mobile-card-label">Vade Tarihi:</div>
+                                            <div class="mobile-card-value">
+                                                <input type="date" value="${kayit.tarih}" 
+                                                       class="tarih-input-mobile w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                                                       data-id="${kayit.id}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    mobileCards.appendChild(card);
+                });
+                
+                // Swipe to delete functionality
+                document.querySelectorAll('.swipe-container').forEach(container => {
+                    let startX = 0;
+                    let currentX = 0;
+                    let isDragging = false;
+                    
+                    const content = container.querySelector('.swipe-content');
+                    const deleteBtn = container.querySelector('.swipe-delete');
+                    
+                    const handleStart = (e) => {
+                        startX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+                        isDragging = true;
+                        container.style.transition = 'none';
+                    };
+                    
+                    const handleMove = (e) => {
+                        if (!isDragging) return;
+                        
+                        currentX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+                        const diffX = currentX - startX;
+                        
+                        if (diffX < 0) { // Sola doğru sürükleme
+                            const translateX = Math.max(diffX, -80);
+                            content.style.transform = `translateX(${translateX}px)`;
+                            deleteBtn.style.transform = `translateX(${translateX + 80}px)`;
+                            
+                            if (Math.abs(diffX) > 60) {
+                                container.classList.add('swiping');
+                            } else {
+                                container.classList.remove('swiping');
+                            }
+                        }
+                    };
+                    
+                    const handleEnd = () => {
+                        if (!isDragging) return;
+                        isDragging = false;
+                        
+                        container.style.transition = 'transform 0.3s ease';
+                        
+                        if (container.classList.contains('swiping')) {
+                            // Silme işlemini gerçekleştir
+                            const id = parseInt(container.getAttribute('data-id'));
+                            vadeKayitlari = vadeKayitlari.filter(k => k.id !== id);
+                            updateTable();
+                            updateMobileCards();
+                            updateSummary();
+                        } else {
+                            // Original pozisyona geri dön
+                            content.style.transform = 'translateX(0)';
+                            deleteBtn.style.transform = 'translateX(80px)';
+                        }
+                    };
+                    
+                    // Mouse events
+                    container.addEventListener('mousedown', handleStart);
+                    container.addEventListener('mousemove', handleMove);
+                    container.addEventListener('mouseup', handleEnd);
+                    container.addEventListener('mouseleave', handleEnd);
+                    
+                    // Touch events
+                    container.addEventListener('touchstart', handleStart);
+                    container.addEventListener('touchmove', handleMove);
+                    container.addEventListener('touchend', handleEnd);
+                });
+                
+                // Mobil tutar inputları için olay dinleyicileri ekle
+                document.querySelectorAll('.tutar-input-mobile').forEach(input => {
+                    input.addEventListener('input', function() {
+                        const formattedValue = formatAmountInput(this.value);
+                        this.value = formattedValue;
+                        
+                        // Anlık olarak güncelle
+                        const id = parseInt(this.getAttribute('data-id'));
+                        const kayit = vadeKayitlari.find(k => k.id === id);
+                        if (kayit) {
+                            try {
+                                kayit.tutar = this.value;
+                                updateSummary();
+                            } catch (e) {
+                                // Hata durumunda hiçbir şey yapma
+                            }
+                        }
+                    });
+                    
+                    input.addEventListener('blur', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        const kayit = vadeKayitlari.find(k => k.id === id);
+                        if (kayit) {
+                            // Boş bırakılırsa 0 olarak kabul et
+                            kayit.tutar = this.value || '0';
+                            this.value = this.value || '';
+                            updateSummary();
+                        }
+                    });
+                });
+                
+                // Mobil gün inputları için olay dinleyicileri ekle
+                document.querySelectorAll('.gun-input-mobile').forEach(input => {
+                    input.addEventListener('input', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        const kayit = vadeKayitlari.find(k => k.id === id);
+                        if (kayit) {
+                            kayit.gun = this.value;
+                            // Tarihi güncelle
+                            if (this.value) {
+                                const gun = parseInt(this.value) || 0;
+                                const yeniTarih = calculateDate(baslangicTarihi, gun);
+                                kayit.tarih = formatDateForInput(yeniTarih);
+                                // İlgili tarih inputunu güncelle
+                                const tarihInput = document.querySelector(`.tarih-input-mobile[data-id="${id}"]`);
+                                if (tarihInput) {
+                                    tarihInput.value = kayit.tarih;
+                                }
+                            }
+                            updateSummary();
+                            // Mobil kartları güncelleme, sadece ilgili inputları güncelle
+                            updateMobileCardRecord(id);
+                        }
+                    });
+                    
+                    input.addEventListener('blur', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        const kayit = vadeKayitlari.find(k => k.id === id);
+                        if (kayit) {
+                            // Boş bırakılırsa 0 olarak kabul et
+                            kayit.gun = this.value || '0';
+                            this.value = this.value || '';
+                            updateSummary();
+                        }
+                    });
+                });
+                
+                // Mobil tarih inputları için olay dinleyicileri ekle
+                document.querySelectorAll('.tarih-input-mobile').forEach(input => {
+                    input.addEventListener('input', function() {
+                        const id = parseInt(this.getAttribute('data-id'));
+                        const kayit = vadeKayitlari.find(k => k.id === id);
+                        if (kayit) {
+                            kayit.tarih = this.value;
+                            // Günü güncelle (takvim günü olarak)
+                            const tarih = new Date(this.value);
+                            const gun = calculateDays(baslangicTarihi, tarih);
+                            kayit.gun = gun.toString();
+                            // İlgili gün inputunu güncelle
+                            const gunInput = document.querySelector(`.gun-input-mobile[data-id="${id}"]`);
+                            if (gunInput) {
+                                gunInput.value = kayit.gun;
+                            }
+                            updateSummary();
+                            // Mobil kartları güncelleme, sadece ilgili inputları güncelle
+                            updateMobileCardRecord(id);
+                        }
+                    });
+                });
+                
+                // Aktif elemanı geri yükle
+                if (activeElementData) {
+                    const newActiveElement = mobileCards.querySelector(`input[data-id="${activeElementData.id}"].${activeElementData.className.split(' ').join('.')}`);
+                    if (newActiveElement) {
+                        newActiveElement.focus();
+                        if (newActiveElement.setSelectionRange) {
+                            newActiveElement.setSelectionRange(activeElementData.selectionStart, activeElementData.selectionEnd);
+                        }
+                    }
+                }
+            }
+            
+            // Sadece belirli bir kaydın mobil kartını güncelle
+            function updateMobileCardRecord(id) {
+                const kayit = vadeKayitlari.find(k => k.id === id);
+                if (!kayit) return;
+                
+                const gunInput = document.querySelector(`.gun-input-mobile[data-id="${id}"]`);
+                const tarihInput = document.querySelector(`.tarih-input-mobile[data-id="${id}"]`);
+                
+                if (gunInput && gunInput.value !== kayit.gun) {
+                    gunInput.value = kayit.gun;
+                }
+                
+                if (tarihInput && tarihInput.value !== kayit.tarih) {
+                    tarihInput.value = kayit.tarih;
+                }
+            }
+            
+            // Özet bilgileri güncelle
+            function updateSummary() {
+                // Sadece tutarı girilmiş kayıtları say
+                const gecerliKayitlar = vadeKayitlari.filter(kayit => {
+                    const tutar = parseFloat(kayit.tutar.replace(/\./g, '').replace(',', '.')) || 0;
+                    return tutar > 0;
+                });
+                
+                // Kayıt sayısı
+                document.getElementById('kayitSayisi').textContent = gecerliKayitlar.length;
+                
+                // Toplam tutar
+                const toplamTutar = gecerliKayitlar.reduce((sum, kayit) => {
+                    const tutar = parseFloat(kayit.tutar.replace(/\./g, '').replace(',', '.')) || 0;
+                    return sum + tutar;
+                }, 0);
+                document.getElementById('toplamTutar').textContent = `₺${formatCurrency(toplamTutar)}`;
+                
+                // Ağırlıklı ortalama vade hesapla
+                if (gecerliKayitlar.length > 0 && toplamTutar > 0) {
+                    let agirlikliGunToplami = 0;
+                    
+                    gecerliKayitlar.forEach(kayit => {
+                        const tutar = parseFloat(kayit.tutar.replace(/\./g, '').replace(',', '.')) || 0;
+                        const gun = parseInt(kayit.gun) || 0;
+                        // Tutar * gün çarpımını ağırlıklı toplama ekle
+                        agirlikliGunToplami += tutar * gun;
+                    });
+                    
+                    // Ağırlıklı ortalama gün = (tutar * gün toplamı) / toplam tutar
+                    const agirlikliOrtalamaGun = Math.round(agirlikliGunToplami / toplamTutar);
+                    document.getElementById('ortalamaVade').textContent = `${agirlikliOrtalamaGun} gün`;
+                    
+                    // Ortalama tarih (takvim günü olarak hesapla)
+                    const ortalamaTarih = calculateDate(baslangicTarihi, agirlikliOrtalamaGun);
+                    document.getElementById('ortalamaTarih').textContent = formatDate(ortalamaTarih);
+                } else {
+                    document.getElementById('ortalamaVade').textContent = '0 gün';
+                    document.getElementById('ortalamaTarih').textContent = '-';
+                }
+            }
+            
+            // Başlangıç tarihi değiştiğinde
+            baslangicTarihiInput.addEventListener('change', function() {
+                baslangicTarihi = new Date(this.value);
+                
+                // Tüm kayıtların gün sayılarını güncelle (vade tarihleri sabit kalsın)
+                vadeKayitlari.forEach(kayit => {
+                    const vadeTarihi = new Date(kayit.tarih);
+                    const gun = calculateDays(baslangicTarihi, vadeTarihi);
+                    kayit.gun = gun.toString();
+                });
+                
+                // Tabloyu, mobil kartları ve özeti güncelle
+                updateTable();
+                updateMobileCards();
+                updateSummary();
+            });
+            
+            // Yeni kayıt ekle butonu
+            yeniKayitEkleBtn.addEventListener('click', function() {
+                // Yeni kayıt ekle - varsayılan vade tarihi bugün, tutar ve gün boş
+                const bugun = new Date();
+                
+                vadeKayitlari.push({
+                    id: nextId++,
+                    tutar: '',
+                    gun: '',
+                    tarih: formatDateForInput(bugun)
+                });
+                
+                // Tabloyu, mobil kartları ve özeti güncelle
+                updateTable();
+                updateMobileCards();
+                updateSummary();
+                
+                // Yeni eklenen kaydın tutar inputuna odaklan
+                setTimeout(() => {
+                    const yeniTutarInput = document.querySelector(`.tutar-input[data-id="${nextId - 1}"]`);
+                    if (yeniTutarInput) {
+                        yeniTutarInput.focus();
+                    } else {
+                        const yeniTutarInputMobile = document.querySelector(`.tutar-input-mobile[data-id="${nextId - 1}"]`);
+                        if (yeniTutarInputMobile) {
+                            yeniTutarInputMobile.focus();
+                        }
+                    }
+                }, 100);
+            });
+            
+            // İlk yükleme
+            updateTable();
+            updateMobileCards();
+            updateSummary();
+        });
+    </script>
+</body>
+</html>
